@@ -55,7 +55,7 @@ class PollReader():
         """
 
         # iterate through each row of the data
-        for row in self.raw_data:
+        for row in self.raw_data[1:]:  # Skip the header row
 
             # split up the row by column
             seperated = row.strip().split(',')
@@ -82,16 +82,17 @@ class PollReader():
         """
         max_harris = max(self.data_dict['Harris result'])
         max_trump = max(self.data_dict['Trump result'])
+
         if max_harris > max_trump:
             return f"Harris {max_harris:.1%}"
         elif max_trump > max_harris:
             return f"Trump {max_trump:.1%}"
         else:
             return f"EVEN {max_harris:.1%}"
+        
 
      
     
-
 
     def likely_voter_polling_average(self):
         """
@@ -103,7 +104,25 @@ class PollReader():
             tuple: A tuple containing the average polling percentages for Harris and Trump
                    among likely voters, in that order.
         """
+        harris_total = 0.0
+        trump_total = 0.0
+        count = 0
+        i = 0
+        while i < len(self.data_dict['sample type']):
+            if self.data_dict['sample type'][i] == 'LV':
+                harris_total += self.data_dict['Harris result'][i]
+                trump_total += self.data_dict['Trump result'][i]
+                count += 1
+            i += 1
+        if count == 0:
+            return (0.0, 0.0)
+        else:
+            harris_avg = harris_total / count
+            trump_avg = trump_total / count
+            return (harris_avg, trump_avg)
         
+        
+
 
 
     def polling_history_change(self):
