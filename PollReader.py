@@ -136,34 +136,13 @@ class PollReader():
             tuple: A tuple containing the net change for Harris and Trump, in that order.
                    Positive values indicate an increase, negative values indicate a decrease.
         """
-        n = len(self.data_dict['date'])
-        if n == 0:
-            return (0.0, 0.0)
-        
-        if n < 30:
-            group_size = n
-        else:
-            group_size = 30
-        
-        early_h_sum = 0.0
-        early_t_sum = 0.0
-        for i in range(0, group_size):
-            early_h_sum += self.data_dict['Harris result'][i]
-            early_t_sum += self.data_dict['Trump result'][i]
-        early_h_avg = early_h_sum / group_size
-        early_t_avg = early_t_sum / group_size
+        early_harris = sum(self.data_dict['Harris result'][:30]) / 30
+        early_trump = sum(self.data_dict['Trump result'][:30]) / 30
 
-        late_h_sum = 0.0
-        late_t_sum = 0.0
-        for i in range(n - group_size, n):
-            late_h_sum += self.data_dict['Harris result'][i]
-            late_t_sum += self.data_dict['Trump result'][i]
-        late_h_avg = late_h_sum / group_size
-        late_t_avg = late_t_sum / group_size
+        late_harris = sum(self.data_dict['Harris result'][-30:]) / 30
+        late_trump = sum(self.data_dict['Trump result'][-30:]) / 30
 
-        h_change = late_h_avg - early_h_avg
-        t_change = late_t_avg - early_t_avg
-        return (h_change, t_change)
+        return (late_harris - early_harris, late_trump - early_trump)
         
 
 
